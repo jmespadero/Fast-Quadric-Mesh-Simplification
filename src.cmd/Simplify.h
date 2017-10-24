@@ -22,7 +22,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
-#include <math.h>
+#include <cmath>
 #include <float.h> //FLT_EPSILON, DBL_EPSILON
 
 #define loopi(start_l,end_l) for ( int i=start_l;i<end_l;++i )
@@ -30,46 +30,40 @@
 #define loopj(start_l,end_l) for ( int j=start_l;j<end_l;++j )
 #define loopk(start_l,end_l) for ( int k=start_l;k<end_l;++k )
 
-struct vec3f
+struct vec3
 {
     double x, y, z;
 
-    inline vec3f( void ) {}
+    inline vec3( void ) {}
 
-    inline vec3f( const double X, const double Y, const double Z )
+    inline vec3( const double X, const double Y, const double Z )
     { x = X; y = Y; z = Z; }
 
-    inline vec3f operator + ( const vec3f& a ) const
-    { return vec3f( x + a.x, y + a.y, z + a.z ); }
+    inline vec3 operator + ( const vec3& a ) const
+    { return vec3( x + a.x, y + a.y, z + a.z ); }
 
-	inline vec3f operator += ( const vec3f& a ) const
-    { return vec3f( x + a.x, y + a.y, z + a.z ); }
+    inline vec3 operator += ( const vec3& a ) const
+    { return vec3( x + a.x, y + a.y, z + a.z ); }
 
-    inline vec3f operator * ( const double a ) const
-    { return vec3f( x * a, y * a, z * a ); }
+    inline vec3 operator * ( const double a ) const
+    { return vec3( x * a, y * a, z * a ); }
 
-    inline vec3f operator * ( const vec3f a ) const
-    { return vec3f( x * a.x, y * a.y, z * a.z ); }
+    inline vec3 operator * ( const vec3& a ) const
+    { return vec3( x * a.x, y * a.y, z * a.z ); }
 
-    inline vec3f v3 () const
-    { return vec3f( x , y, z ); }
+    inline vec3 operator / ( const vec3& a ) const
+    { return vec3( x / a.x, y / a.y, z / a.z ); }
 
-    inline vec3f operator = ( const vec3f a )
-    { x=a.x;y=a.y;z=a.z;return *this; }
+    inline vec3 operator - ( const vec3& a ) const
+    { return vec3( x - a.x, y - a.y, z - a.z ); }
 
-    inline vec3f operator / ( const vec3f a ) const
-    { return vec3f( x / a.x, y / a.y, z / a.z ); }
+    inline vec3 operator / ( const double a ) const
+    { return vec3( x / a, y / a, z / a ); }
 
-    inline vec3f operator - ( const vec3f& a ) const
-    { return vec3f( x - a.x, y - a.y, z - a.z ); }
-
-    inline vec3f operator / ( const double a ) const
-    { return vec3f( x / a, y / a, z / a ); }
-
-    inline double dot( const vec3f& a ) const
+    inline double dot( const vec3& a ) const
     { return a.x*x + a.y*y + a.z*z; }
 
-    inline vec3f cross( const vec3f& a , const vec3f& b )
+    inline vec3 cross( const vec3& a , const vec3& b )
     {
 		x = a.y * b.z - a.z * b.y;
 		y = a.z * b.x - a.x * b.z;
@@ -77,22 +71,10 @@ struct vec3f
 		return *this;
 	}
 
-    inline double length() const
+    inline vec3 normalize()
     {
-		return (double)sqrt(x*x + y*y + z*z);
-	}
-
-    inline vec3f normalize( double desired_length = 1 )
-    {
-		double square = sqrt(x*x + y*y + z*z);
-		/*
-		if (square <= 0.00001f )
-		{
-			x=1;y=0;z=0;
-			return *this;
-		}*/
-		//double len = desired_length / square;
-		x/=square;y/=square;z/=square;
+        double len = sqrt(x*x + y*y + z*z);
+        x/=len;y/=len;z/=len;
 
 		return *this;
 	}
@@ -117,20 +99,18 @@ class SymetricMatrix {
 			                                        m[9] = m44;
 	}
 
-	// Make plane
-
+    ///Quadric of a plane
 	SymetricMatrix(double a,double b,double c,double d)
 	{
-		m[0] = a*a;  m[1] = a*b;  m[2] = a*c;  m[3] = a*d;
-		             m[4] = b*b;  m[5] = b*c;  m[6] = b*d;
-		                          m[7 ] =c*c; m[8 ] = c*d;
-		                                       m[9 ] = d*d;
+        m[0] = a*a;  m[1] = a*b;  m[2] = a*c; m[3] = a*d;
+                     m[4] = b*b;  m[5] = b*c; m[6] = b*d;
+                                  m[7] = c*c; m[8] = c*d;
+                                              m[9] = d*d;
 	}
 
 	double operator[](int c) const { return m[c]; }
 
-	// Determinant
-
+    /// Determinant
 	double det(	int a11, int a12, int a13,
 				int a21, int a22, int a23,
 				int a31, int a32, int a33)
@@ -156,6 +136,7 @@ class SymetricMatrix {
 		return *this;
 	}
 
+    //The values
 	double m[10];
 };
 ///////////////////////////////////////////
@@ -163,9 +144,8 @@ class SymetricMatrix {
 namespace Simplify
 {
 	// Global Variables & Strctures
-
-	struct Triangle { int v[3];double err[4];int deleted,dirty;vec3f n; };
-	struct Vertex { vec3f p;int tstart,tcount;SymetricMatrix q;int border;};
+    struct Triangle { int v[3];double err[4];int deleted,dirty;vec3 n; };
+    struct Vertex { vec3 p;int tstart,tcount;SymetricMatrix q;int border;};
 	struct Ref { int tid,tvertex; };
 	std::vector<Triangle> triangles;
 	std::vector<Vertex> vertices;
@@ -174,14 +154,14 @@ namespace Simplify
 	// Helper functions
 
 	/// Error between vertex and Quadric
-	double vertex_error(const SymetricMatrix &q, const vec3f &p)
+    double vertex_error(const SymetricMatrix &q, const vec3 &p)
 	{
  		return   q[0]*p.x*p.x + 2*q[1]*p.x*p.y + 2*q[2]*p.x*p.z + 2*q[3]*p.x + q[4]*p.y*p.y
  		     + 2*q[5]*p.y*p.z + 2*q[6]*p.y + q[7]*p.z*p.z + 2*q[8]*p.z + q[9];
 	}
 
 	/// Error for one edge
-	double calculate_error(int id_v1, int id_v2, vec3f &p_result)
+    double calculate_error(int id_v1, int id_v2, vec3 &p_result)
 	{
 		// compute interpolated vertex
 
@@ -201,23 +181,29 @@ namespace Simplify
 		}
 		else
 		{
-			// det = 0 -> try to find best result
-			vec3f p1=vertices[id_v1].p;
-			vec3f p2=vertices[id_v2].p;
-			vec3f p3=(p1+p2)/2;
-			double error1 = vertex_error(q, p1);
-			double error2 = vertex_error(q, p2);
-			double error3 = vertex_error(q, p3);
-			error = fmin(error1, fmin(error2, error3));
-			if (error1 == error) p_result=p1;
-			if (error2 == error) p_result=p2;
-			if (error3 == error) p_result=p3;
-		}
+            // det = 0 -> choose best result between extremes and some midpoint
+            const vec3 p1=vertices[id_v1].p;
+            const vec3 p2=vertices[id_v2].p;
+            p_result = p1;
+            error = vertex_error(q, p_result);
+            const unsigned midPoints = 9;
+            for(double i=1; i<midPoints; i++)
+            {
+                vec3 p = p1*double(midPoints-1-i)/(midPoints-1) + p2*double(i)/(midPoints-1);
+                double error_p = vertex_error(q, p);
+                if (error_p < error)
+                {
+                    p_result=p;
+                    error = error_p;
+                }
+            }//for
+
+        }
 		return error;
 	}//double calculate_error(int id_v1, int id_v2, vec3f &p_result)
 
 	/// Check if a triangle flips when this edge is removed
-	bool flipped(const vec3f &p,int i0,int i1, const Vertex &v0, const Vertex &v1, std::vector<int> &deleted)
+    bool flipped(const vec3 &p,int i0,int i1, const Vertex &v0, const Vertex &v1, std::vector<int> &deleted)
 	{
 
 		loopk(0,v0.tcount)
@@ -235,10 +221,12 @@ namespace Simplify
 				deleted[k]=1;
 				continue;
 			}
-			vec3f d1 = vertices[id1].p-p; d1.normalize();
-			vec3f d2 = vertices[id2].p-p; d2.normalize();
+            vec3 d1 = vertices[id1].p-p;
+            d1.normalize();
+            vec3 d2 = vertices[id2].p-p;
+            d2.normalize();
 			if(fabs(d1.dot(d2))>0.999) return true;
-			vec3f n;
+            vec3 n;
 			n.cross(d1,d2);
 			n.normalize();
 			deleted[k]=0;
@@ -250,7 +238,7 @@ namespace Simplify
 	/// Update triangle connections and edge error after a edge is collapsed
 	void update_triangles(int i0, const Vertex &v,const std::vector<int> &deleted,int &deleted_triangles)
 	{
-		vec3f p;
+        vec3 p;
 		loopk(0,v.tcount)
 		{
 			const Ref r=refs[v.tstart+k];
@@ -300,7 +288,7 @@ namespace Simplify
 			loopi(0,triangles.size())
 			{
 				Triangle &t=triangles[i];
-				vec3f n,p[3];
+                vec3 n,p[3];
 				loopj(0,3) p[j]=vertices[t.v[j]].p;
 				n.cross(p[1]-p[0],p[2]-p[0]);
 				n.normalize();
@@ -311,7 +299,7 @@ namespace Simplify
 			loopi(0,triangles.size())
 			{
 				// Calc Edge Error
-				Triangle &t=triangles[i];vec3f p;
+                Triangle &t=triangles[i];vec3 p;
 				loopj(0,3) t.err[j]=calculate_error(t.v[j],t.v[(j+1)%3],p);
 				t.err[3]=fmin(t.err[0],fmin(t.err[1],t.err[2]));
 			}
@@ -486,8 +474,8 @@ namespace Simplify
 					if(v0.border != v1.border)  continue;
 
 					// Compute vertex to collapse to
-					vec3f p;
-					calculate_error(i0,i1,p);
+                    vec3 p;
+                    calculate_error(i0, i1, p);
 					deleted0.resize(v0.tcount); // normals temporarily
 					deleted1.resize(v1.tcount); // normals temporarily
 					// dont remove if flipped
@@ -571,7 +559,7 @@ namespace Simplify
 					if(v0.border != v1.border)  continue;
 
 					// Compute vertex to collapse to
-					vec3f p;
+                    vec3 p;
 					calculate_error(i0,i1,p);
 
 					deleted0.resize(v0.tcount); // normals temporarily
