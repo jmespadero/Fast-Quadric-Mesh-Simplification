@@ -11,4 +11,4 @@ Mesh triangle reduction using quadrics - for Windows, OSX and Linux (thx Chris R
 
 License : MIT
 
-Please dont forget to cite this page if you use the code!
+Please dont forget to cite [this page](https://github.com/sp4cerat/Fast-Quadric-Mesh-Simplification) if you use the code!
