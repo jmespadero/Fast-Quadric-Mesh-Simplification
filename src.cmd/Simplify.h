@@ -30,22 +30,11 @@
 #define loopj(start_l,end_l) for ( int j=start_l;j<end_l;++j )
 #define loopk(start_l,end_l) for ( int k=start_l;k<end_l;++k )
 
-struct vector3
-{
-double x, y, z;
-};
-
 struct vec3f
 {
     double x, y, z;
 
     inline vec3f( void ) {}
-
-    //inline vec3f operator =( vector3 a )
-	// { vec3f b ; b.x = a.x; b.y = a.y; b.z = a.z; return b;}
-
-    inline vec3f( vector3 a )
-	 { x = a.x; y = a.y; z = a.z; }
 
     inline vec3f( const double X, const double Y, const double Z )
     { x = X; y = Y; z = Z; }
@@ -64,9 +53,6 @@ struct vec3f
 
     inline vec3f v3 () const
     { return vec3f( x , y, z ); }
-
-    inline vec3f operator = ( const vector3 a )
-    { x=a.x;y=a.y;z=a.z;return *this; }
 
     inline vec3f operator = ( const vec3f a )
     { x=a.x;y=a.y;z=a.z;return *this; }
